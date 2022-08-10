@@ -5,6 +5,8 @@ import datetime
 import math
 import random 
 
+import time
+
 
 PI = math.pi
 
@@ -154,11 +156,21 @@ camera.rotation_mode = 'XYZ'
 camera.rotation_euler[0]=90 * (PI/ 180.0)
 camera.rotation_euler[1]=0 * (PI/ 180.0)
 
-bpy.data.objects['Camera'].select=False
+
+
+# bpy.data.objects['Camera'].select=False
 bpy.data.objects['Camera'].select=True
 
 bpy.context.object.scan_type='kinect'
 bpy.context.object.save_scan=True
+
+# bpy.context.object.location[0]=-1
+# bpy.context.object.location[1]=-2
+# bpy.context.object.location[2]=0
+
+bpy.context.object.kinect_xres=20
+bpy.context.object.kinect_yres=20
+bpy.context.object.local_coordinates=False
 
 reset=2
 angle_camera= 30
@@ -193,8 +205,8 @@ action_state=np.array([[1,0,0,0,0,0], #Up
 #Configuration in Blensor
 
 step_size=0.2
-step_choice=1
-nr_steps=10
+step_choice=4
+nr_steps=1
 limit_length=3
 limit_width=3
 
@@ -204,7 +216,7 @@ actions=np.array(range(1,13))
 
 
 
-
+start_time = time.time()
 
 for i in range(nr_steps):
     #bpy.ops.blensor.delete_scans()
@@ -232,31 +244,36 @@ for i in range(nr_steps):
                 scene=scene)
 
 
-    now = datetime.datetime.now()
-    current_time = now.strftime("%Y%m%d%H%M%S")
-
-    #path_file="/home/alex-pop/Desktop/DAte/cl_pcd_"+"box"+str(Object_nr)+"_"+str(dist_choice)+"_"+str(angle_choice)+"_"+ str(corner_choice)+"_"+str(current_time)+"_"+str(t)+".pcd"
-    path_file="/home/alex-pop/Desktop/Doctorat/Blender_views/Sim_output/out_"+str(current_time)+".pcd"
     
 
-    f=open(path_file,"w") #File location to modify
-    i = 0; #Storage point cloud number
-    for item in bpy.data.objects:
-        if item.type == 'MESH' and item.name.startswith('Scan'):
-            print('write once')
-            for sp in item.data.vertices:
-                #print('X=%+#5.3f\tY=%+#5.3f\tZ=%+#5.3f' % (sp.co[0], sp.co[1],sp.co[2]));
-                if(  (np.isnan(sp.co[0])==0) and(np.isnan(sp.co[1])==0) and (np.isnan(sp.co[2])==0) ):
-                    string_out='%#5.3f\t%#5.3f\t%#5.3f \n' % (sp.co[0], sp.co[1],sp.co[2])
-                    i = i+1
-                    f.write(string_out);  
-    f.close()          
-    f=open(path_file,"r+") #File location to modify
-    new_data = ("# .PCD v0.7 - Point Cloud Data file format\nVERSION 0.7\nFIELDS x y z\nSIZE 4 4 4\nTYPE F F F\nCOUNT 1 1 1\nWIDTH %d\nHEIGHT 1\nVIEWPOINT 0 0 0 1 0 0 0\nPOINTS %d\nDATA ascii\n" %(i,i))
-    old = f.read()
-    f.seek(0)
-    f.write(new_data)
-    f.write(old)
+now = datetime.datetime.now()
+current_time = now.strftime("%Y%m%d%H%M%S")
+end_time = time.time()
+
+print(end_time-start_time)
+
+    #path_file="/home/alex-pop/Desktop/DAte/cl_pcd_"+"box"+str(Object_nr)+"_"+str(dist_choice)+"_"+str(angle_choice)+"_"+ str(corner_choice)+"_"+str(current_time)+"_"+str(t)+".pcd"
+path_file="/home/alex-pop/Desktop/Doctorat/Blender_views/Sim_output/out_"+str(current_time)+".pcd"
+
+
+f=open(path_file,"w") #File location to modify
+i = 0; #Storage point cloud number
+for item in bpy.data.objects:
+    if item.type == 'MESH' and item.name.startswith('Scan'):
+        print('write once')
+        for sp in item.data.vertices:
+            #print('X=%+#5.3f\tY=%+#5.3f\tZ=%+#5.3f' % (sp.co[0], sp.co[1],sp.co[2]));
+            if(  (np.isnan(sp.co[0])==0) and(np.isnan(sp.co[1])==0) and (np.isnan(sp.co[2])==0) ):
+                string_out='%#5.3f\t%#5.3f\t%#5.3f \n' % (sp.co[0], sp.co[1],sp.co[2])
+                i = i+1
+                f.write(string_out);  
+f.close()          
+f=open(path_file,"r+") #File location to modify
+new_data = ("# .PCD v0.7 - Point Cloud Data file format\nVERSION 0.7\nFIELDS x y z\nSIZE 4 4 4\nTYPE F F F\nCOUNT 1 1 1\nWIDTH %d\nHEIGHT 1\nVIEWPOINT 0 0 0 1 0 0 0\nPOINTS %d\nDATA ascii\n" %(i,i))
+old = f.read()
+f.seek(0)
+f.write(new_data)
+f.write(old)
 
 
          
