@@ -1,5 +1,5 @@
-from env.env import  Env
-from RL.pcl_agent.rainbow import PCL_rainbow
+from rl.env.env import  Env
+from rl.pcl_agent.rainbow import PCL_rainbow
 import os
 import numpy as np
 from tqdm import trange

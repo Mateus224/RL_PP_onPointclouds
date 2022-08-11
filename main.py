@@ -2,13 +2,9 @@ import os
 import torch
 import argparse
 import configparser
-import render_UUV_env as env3D
-import run_terminal as env_terminal
-from Agents.lawnMower.lawnMower import lawnMower
+import run 
 
-
-from Env.env3d import  Env
-from Env.load_env import Load_env
+from rl.env.env import  Env
 
 def parse():
     parser = argparse.ArgumentParser(description="MLDS&ADL HW3")
@@ -64,4 +60,4 @@ if __name__ == '__main__':
     if args.rainbow:
         from Agents.pcl_rainbow.agent import PCL_rainbow
         agent = PCL_rainbow(args, env)
-     env_terminal.init(args, env, agent, config)
+    init(args, env, agent, config)
