@@ -3,8 +3,8 @@ import torch
 import argparse
 import configparser
 import run 
-
-from rl.env.env import  Env
+from env3d.agent.transition import Transition
+from env3d.env import  Env
 
 def parse():
     parser = argparse.ArgumentParser(description="MLDS&ADL HW3")
@@ -27,6 +27,8 @@ def parse():
     parser.add_argument('--evaluation-interval', type=int, default=12000, metavar='STEPS', help='Number of training steps between evaluations')
     parser.add_argument('--target-update', type=int, default=int(8e3), metavar='τ', help='Number of steps after which to update target network')
     parser.add_argument('--id', type=str, default='3Dexperiment', help='Experiment ID')
+    parser.add_argument('--model_path', type=str, default = "results/3Dexperiment/checkpoint.pth", help='model used during testing / visulization') #testmoreFilters.h5
+    parser.add_argument('--exp_name', type=str, default = "", help='')
 
     try:
         from argument import add_arguments

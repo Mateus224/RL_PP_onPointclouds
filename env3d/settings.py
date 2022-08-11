@@ -1,5 +1,6 @@
-#import bpy
-
+import bpy
+import json
+import numpy as np
 
 class Scene_settings():
 

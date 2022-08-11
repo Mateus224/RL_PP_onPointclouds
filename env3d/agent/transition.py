@@ -1,12 +1,13 @@
-
+import json
+import numpy as np
 
 
 class Transition():
-    __init__(self, config):
+    def __init__(self, config):
         json_env_shape=config.get('ENV','shape')
         list_env_shape=json.loads(json_env_shape)
         self.env_shape=np.array(list_env_shape)
-        self.step_size= config.getint(step_size)
+        self.step_size= config.getint('Agent01', 'step_size')
 
         self.x = self.env_shape[0]
         self.y = self.env_shape[1]
@@ -14,9 +15,7 @@ class Transition():
 
 
     def check_transition(actions):
-    
-
-    return None
+        pass
 
     def read_verts(mesh):
         mverts_co = np.zeros((len(mesh.vertices)*3), dtype=np.float)

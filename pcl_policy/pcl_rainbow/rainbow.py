@@ -10,7 +10,7 @@ from torchsummary import summary
 from numpy.random import default_rng
 rng = default_rng(12345)
 #
-from Agents.multiagent_rainbow.model import DQN, DQN_ResNet, ResBlock
+from pcl_policy.pcl_rainbow.model import DQN, DQN_ResNet, ResBlock
 
 from numpy.random import default_rng
 rng = default_rng(12345)

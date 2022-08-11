@@ -3,8 +3,8 @@ import datetime
 import math
 import random
 import utils.math_f  
-from settings import Scene_settings
-
+from env3d.settings import Scene_settings
+from env3d.agent.transition import Transition
 import time
 
 
