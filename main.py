@@ -1,9 +1,10 @@
 import os
+import sys
+print(sys.path)
 import torch
 import argparse
 import configparser
-import run 
-from env3d.agent.transition import Transition
+from env3d.transition import Transition
 from env3d.env import  Env
 
 def parse():
