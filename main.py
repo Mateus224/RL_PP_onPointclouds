@@ -1,10 +1,11 @@
 import os
 import sys
-print(sys.path)
 import torch
 import argparse
 import configparser
-from env3d.transition import Transition
+
+sys.path.insert(1,"/home/matthias/pcl_agent")
+from env3d.agent.transition import Transition
 from env3d.env import  Env
 
 def parse():
