@@ -13,6 +13,7 @@ PI = math.pi
 
 class Env(object):
     def __init__(self,args,config):
+        print('rWsssssssssS')
         self.transition=Transition(config)
         self.config=config
         scene=Scene_settings(self.config)

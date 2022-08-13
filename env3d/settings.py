@@ -14,8 +14,7 @@ class Scene_settings():
         self.camera.rotation_euler[0]=90 * (np.pi/ 180.0)
         self.camera.rotation_euler[1]=0 * (np.pi/ 180.0)
 
-        self.dim_reduction=4 ###Need to load from file
-        self.nr_objects=2 
+      
 
 
 
@@ -33,25 +32,41 @@ class Scene_settings():
         camera.kinect_yres=self.sensor_rays[1]
         camera.local_coordinates=False
 
-    def delete_meshes(scene):
+
+        self.dim_reduction=4 ###Need to load from file
+        
+
+        self.nr_objects= 13
+
+
+        self.file_names=['./pcl_agent/scenario/separate_objects/Cube.obj',
+            './pcl_agent/scenario/separate_objects/Long_Cube.obj',
+            './pcl_agent/scenario/separate_objects/Edge_Cube.obj',
+            './pcl_agent/scenario/separate_objects/Pyramid.obj']
+
+    
+ 
+    
+    
+    def delete_meshes(self):
             meshes = set()
             # Get objects in the collection if they are meshes
-            for obj in [o for o in scene.objects if (o.type == 'MESH' and not(o.name.startswith('Plane')))]:
+            for obj in [o for o in self.scene.objects if (o.type == 'MESH' and not(o.name.startswith('Plane')))]:
                 meshes.add( obj.data )
                 bpy.data.objects.remove(obj)
 
             # Look at meshes that are orphean after objects removal
             for mesh in [m for m in meshes if m.users == 0]:
                 # Delete the meshes
-                bpy.data.meshes.remove(mesh )
+                bpy.data.meshes.remove(mesh)
 
-    def load_object_meshes(nr_objects,max_nr_objects,file_names):
-            object_array=np.random.randint(4, size=nr_objects)
-            for i in object_array:
-                imported_object = bpy.ops.import_scene.obj(filepath=str(file_names[i]))
+    def load_object_meshes(self):
+        object_array=np.random.randint(4, size=self.nr_objects)
+        for i in object_array:
+            imported_object = bpy.ops.import_scene.obj(filepath=str(self.file_names[i]))
 
 
     
     def creat_scene(self):
-
+        self.load_object_meshes()
         return 

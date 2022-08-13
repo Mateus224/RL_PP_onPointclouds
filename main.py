@@ -5,10 +5,21 @@ import argparse
 import configparser
 
 sys.path.insert(1,"/home/matthias/pcl_agent")
-from env3d.agent.transition import Transition
-from env3d.env import  Env
 
+sys.path.insert(1,"/home/matthias/pcl_agent/env3d")
+sys.path.insert(1,"/home/matthias/pcl_agent/env3d/agent")
+
+sys.path.insert(1,"/home/matthias/pcl_agent/pcl_policy/pcl_rainbow")
+import env
+import transition
+
+from importlib import reload
 import run
+reload(run)
+reload(env)
+reload(transition)
+from env import Env
+from agent.transition import Transition
 
 def parse():
     parser = argparse.ArgumentParser(description="MLDS&ADL HW3")
