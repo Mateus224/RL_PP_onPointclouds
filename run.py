@@ -3,14 +3,18 @@ from pcl_policy.pcl_rainbow.rainbow import PCL_rainbow
 import os
 import numpy as np
 from tqdm import trange
+from pcl_policy.pcl_rainbow.memory import ReplayMemory
 
 
 
-def init(agrs,env, agent,config):
+def init(args,env, agent,config):
 
-    if args.train:
+    if True:
+        print('aassaa')
         agent.train()
+        print('aassaa')
         if type(agent)==PCL_rainbow:
+            print('aa34aa')
             timeout=False
             mem = ReplayMemory(args, args.num_replay_memory)
             priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
@@ -19,7 +23,8 @@ def init(agrs,env, agent,config):
                 os.makedirs(results_dir)
             T, done = 0, False
             sum_reward=0
-            state, _ = env.reset(h_level=False)
+            print('12345')
+            state, _ = env.reset()
             for T in trange(1, int(args.num_steps)):
                 if done or timeout:
 

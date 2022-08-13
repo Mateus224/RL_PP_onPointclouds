@@ -27,7 +27,8 @@ class PCL_rainbow():
     self.batch_size = 32 #args.batch_size
     self.n = 1#args.multi_step
     self.discount = 0.99 #args.discount
-    self.norm_clip = args.norm_clip
+    #self.norm_clip = args.norm_clip
+    self.norm_clip = 10
     self.device=args.device
 
     #self.online_net = DQN(args, self.action_space).to(device=args.device)

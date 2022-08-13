@@ -11,24 +11,44 @@ class Scene_settings():
         self.scene = bpy.context.scene
         self.camera = bpy.data.objects['Camera']
         self.camera.rotation_mode = 'XYZ'
-        self.camera.rotation_euler[0]=90 * (PI/ 180.0)
-        self.camera.rotation_euler[1]=0 * (PI/ 180.0)
+        self.camera.rotation_euler[0]=90 * (np.pi/ 180.0)
+        self.camera.rotation_euler[1]=0 * (np.pi/ 180.0)
+
+        self.dim_reduction=4 ###Need to load from file
+        self.nr_objects=2 
 
 
 
         # bpy.data.objects['Camera'].select=False
-        bpy.data.objects['Camera'].select=True
+        camera.objects['Camera'].select=True
 
-        bpy.context.object.scan_type='kinect'
-        bpy.context.object.save_scan=True
+        camera.scan_type='kinect'
+        camera.save_scan=True
 
         # bpy.context.object.location[0]=-1
         # bpy.context.object.location[1]=-2
         # bpy.context.object.location[2]=0
 
-        bpy.context.object.kinect_xres=self.sensor_rays[0]
-        bpy.context.object.kinect_yres=self.sensor_rays[1]
-        bpy.context.object.local_coordinates=False
+        camera.kinect_xres=self.sensor_rays[0]
+        camera.kinect_yres=self.sensor_rays[1]
+        camera.local_coordinates=False
+
+    def delete_meshes(scene):
+            meshes = set()
+            # Get objects in the collection if they are meshes
+            for obj in [o for o in scene.objects if (o.type == 'MESH' and not(o.name.startswith('Plane')))]:
+                meshes.add( obj.data )
+                bpy.data.objects.remove(obj)
+
+            # Look at meshes that are orphean after objects removal
+            for mesh in [m for m in meshes if m.users == 0]:
+                # Delete the meshes
+                bpy.data.meshes.remove(mesh )
+
+    def load_object_meshes(nr_objects,max_nr_objects,file_names):
+            object_array=np.random.randint(4, size=nr_objects)
+            for i in object_array:
+                imported_object = bpy.ops.import_scene.obj(filepath=str(file_names[i]))
 
 
     

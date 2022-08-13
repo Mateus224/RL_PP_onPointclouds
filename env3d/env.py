@@ -15,14 +15,14 @@ class Env(object):
     def __init__(self,args,config):
         self.transition=Transition(config)
         self.config=config
-        scence=Scene_settings(self.config)
+        scene=Scene_settings(self.config)
 
 
     def reset(self):
         self.timeout=False 
         self.done=False
-        self.scene = self.creat_scean()
-        scence.create_scene()
+        self.scene = self.creat_scene()
+        scene.create_scene()
         
 
 
