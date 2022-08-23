@@ -7,6 +7,7 @@ import bpy
 import mathutils
 import open3d as o3d
 import datetime
+import scipy
 
 import math
 import random 
@@ -75,10 +76,50 @@ def matrix_from_euler_xyz(e):
         passive_matrix_from_angle(2, gamma))
     return R
 
+def pointInsideMesh(point,ob):
+   
+    axes = [ mathutils.Vector((1.,0.,0.)) ]
+    outside = False
+    for axis in axes:
+        
+        
+        mat = ob.matrix_world
+
+        print(mat)
+
+        
+
+        
+
+        mat=mathutils.Matrix(([1.,0.,0.,mat[0][3]],[0.,1.,0.,mat[1][3]],[0.,0.,1.,mat[2][3]],[0.,0.,0.,1]))
+
+        
+
+        print(mat)
+
+        mat.invert()
+
+        print(mat)
+
+        orig = mat*point
+        count = 0
+ 
+        while True:
+            index,location,normal,face  = ob.ray_cast(orig,orig+axis*10000.0)
+               
+            if index == False: 
+                break
+            count += 1
+            
+           
+            orig = location + axis*0.00001
+        if count%2 == 0:
+            outside = True
+               
+    return not outside
 
 
-
-def transition(step_size,step_choice,action_state,limit_length,limit_width,camera,scene):
+def transition(step_size,step_choice,action_state,limit_length,limit_width,camera,scene,obs):
         
         pointcloud=np.array([0,0,0])
         
@@ -108,6 +149,8 @@ def transition(step_size,step_choice,action_state,limit_length,limit_width,camer
         simulated_pos_y=camera.location.y+ step_size* final_step[0]
         simulated_pos_z=camera.location.z+ step_size* final_step[2]
 
+        
+
         #print(str(simulated_pos_x)+" "+str(simulated_pos_y))
 
         if(abs(simulated_pos_x)>abs(limit_length)):
@@ -118,6 +161,18 @@ def transition(step_size,step_choice,action_state,limit_length,limit_width,camer
             return 0,pointcloud
 
         if( (abs(simulated_pos_x)<=abs(limit_length)) and (abs(simulated_pos_y)<=abs(limit_width))):
+
+            camera_position =mathutils.Vector((simulated_pos_x,simulated_pos_y,simulated_pos_z))
+
+            inside=False
+
+            for ob in obs:
+                inside=(pointInsideMesh(camera_position,ob))
+                print(inside)
+                if (inside==True):
+                    break
+
+            #if(inside==False):
             camera.location.x =camera.location.x+ step_size* final_step[1]
             camera.location.y =camera.location.y+ step_size* final_step[0] 
             camera.location.z =camera.location.z+ final_step[2] * step_size
@@ -129,6 +184,9 @@ def transition(step_size,step_choice,action_state,limit_length,limit_width,camer
             bpy.ops.blensor.scan()
 
             pointcloud=append_scan(camera,scene)
+
+            if(inside):
+                print("Simulated point inside mesh")
 
             return 1,pointcloud
 
@@ -167,7 +225,7 @@ def append_scan(camera,scene):
 
     return pointcloud
 
-def q_guided_transition(sorted_actions,step_size,action_state,limit_length,limit_width,camera,scene):
+def q_guided_transition(sorted_actions,step_size,action_state,limit_length,limit_width,camera,scene,obs):
     ok=0
     for j in sorted_actions:
 
@@ -178,14 +236,15 @@ def q_guided_transition(sorted_actions,step_size,action_state,limit_length,limit
                     limit_length=limit_length,
                     limit_width=limit_width,
                     camera=camera,
-                    scene=scene)
+                    scene=scene,
+                    obs=obs)
         if (ok==1):
             print("Action "+str(i)+" :"+str(j))
             return ok,pointcloud
             
     return ok,pointcloud
 
-def q_episode(action_state,step_size,nr_steps,limit_length,limit_width,camera,scene,on=0):
+def q_episode(action_state,step_size,nr_steps,limit_length,limit_width,camera,scene,obs,on=0):
     pointcloud=np.array([0,0,0])
     actions=range(action_state.shape[0])
 
@@ -200,11 +259,12 @@ def q_episode(action_state,step_size,nr_steps,limit_length,limit_width,camera,sc
                             limit_length=limit_length,
                             limit_width=limit_width,
                             camera=camera,
-                            scene=scene)
+                            scene=scene,
+                            obs=obs)
 
     return pointcloud
 
-def simple_episode(step_size,nr_steps,limit_length,limit_width,camera,scene,on=0):
+def simple_episode(step_size,nr_steps,limit_length,limit_width,camera,scene,obs,on=0):
     pointcloud=np.array([0,0,0])
     if (on==1):
         for i in range(nr_steps):
@@ -218,7 +278,8 @@ def simple_episode(step_size,nr_steps,limit_length,limit_width,camera,scene,on=0
                                             limit_length=limit_length,
                                             limit_width=limit_width,
                                             camera=camera,
-                                            scene=scene)
+                                            scene=scene,
+                                            obs=obs)
 
 
                 if (ok==0):
@@ -256,7 +317,7 @@ def check_nr_objects(nr_objects,max_nr_objects):
 def create_obj_list(scene):
     obs = []       
     for ob in scene.objects:
-        if ob.type == 'MESH' and not(ob.name.startswith('Plane')):
+        if ob.type == 'MESH' and not(ob.name.startswith('Plane')) and not(ob.name.startswith('Scan')):
             #ob.rotation_euler[2]=(rotation_high-rotation_low) * (PI/ 180.0)* np.random.random_sample() + rotation_low * (PI/ 180.0)
             obs.append(ob)
 
@@ -488,6 +549,8 @@ load_object_meshes(nr_objects,max_nr_objects,file_names,on=load_meshes)
 
 obs=create_obj_list(scene)
 
+print(obs)
+
 
 place_selection= np.random.permutation(dim_reduction*dim_reduction)
 x_selection,y_selection=np.divmod(place_selection, dim_reduction)
@@ -508,10 +571,10 @@ delete_scans(on=delete_previous_scans)
 pointcloud=np.array([0,0,0])
 
 if ( (q_epi!=s_epi) and (q_epi==1)):
-    pointcloud =q_episode(action_state,step_size,nr_steps,limit_length,limit_width,camera,scene,on=q_epi)
+    pointcloud =q_episode(action_state,step_size,nr_steps,limit_length,limit_width,camera,scene,obs=obs,on=q_epi)
 
 elif (s_epi==1):
-    pointcloud =simple_episode(step_size,nr_steps,limit_length,limit_width,camera,scene,on=s_epi)
+    pointcloud =simple_episode(step_size,nr_steps,limit_length,limit_width,camera,scene,obs=obs,on=s_epi)
 # if(q_epi!=s_epi):
 #     pointcloud =q_episode(action_state,step_size,nr_steps,limit_length,limit_width,camera,scene,on=q_epi)
 
