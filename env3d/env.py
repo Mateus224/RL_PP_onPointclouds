@@ -2,9 +2,17 @@ import numpy as np
 import datetime
 import math
 import random
-import utils.math_f  
-from env3d.settings import Scene_settings
+import math_f  
+from importlib import reload
+import settings
+import env3d.agent.transition
+
+reload(settings)
+reload(env3d.agent.transition)
+
+from settings import Scene_settings
 from env3d.agent.transition import Transition
+
 import time
 
 
@@ -13,33 +21,38 @@ PI = math.pi
 
 class Env(object):
     def __init__(self,args,config):
-        print('rWsssssssssS')
-        self.transition=Transition(config)
+        self.scene=Scene_settings(config)
+        self.transition=Transition(config,self.scene)
         self.config=config
-        scene=Scene_settings(self.config)
+        
+        
 
 
     def reset(self):
         self.timeout=False 
         self.done=False
-        self.scene = self.creat_scene()
-        scene.create_scene()
-        
+       
+        self.pcl= np.zeros((3,4000))
+        self.pose=np.zeros((3,1))
+        self.scene.delete_meshes()
+        self.scene.create_scene()
+        #state=np.row_stack((self.pcl,self.pose))
+        return self.pcl , 0
 
 
 
 
 
-    def step( sorted_actions, camera,scene):
-        action = self.transition.check_transition(sorted_actions)
+    def step(self, sorted_actions):
+        action = self.transition.legal_transition(sorted_actions)
         if action is not None:
-            observation=self.transition.make_action(action)
+            pointcloud=self.transition.make_action(action)
 
 
 
 
 
-        return 
+        return pointcloud, 0, 0,0,0,0
 
     def Q_guided_action(sorted_actions,step_size,action_state,limit_length,limit_width,camera,scene):
         for j in sorted_actions:

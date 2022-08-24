@@ -5,21 +5,26 @@ import argparse
 import configparser
 
 sys.path.insert(1,"/home/matthias/pcl_agent")
-
+sys.path.insert(1,"/home/matthias/pcl_agent/pcl_policy/pcl_rainbow")
+sys.path.insert(1,"/home/matthias/pcl_agent/utils")
 sys.path.insert(1,"/home/matthias/pcl_agent/env3d")
 sys.path.insert(1,"/home/matthias/pcl_agent/env3d/agent")
 
-sys.path.insert(1,"/home/matthias/pcl_agent/pcl_policy/pcl_rainbow")
+
 import env
 import transition
+import settings
+import rainbow 
 
 from importlib import reload
 import run
+reload(rainbow)
 reload(run)
 reload(env)
 reload(transition)
 from env import Env
-from agent.transition import Transition
+from transition import Transition
+from rainbow import PCL_rainbow
 
 def parse():
     parser = argparse.ArgumentParser(description="MLDS&ADL HW3")
@@ -111,7 +116,7 @@ if __name__ == '__main__':
     
     env = Env(args, config)
     if True:
-        from pcl_policy.pcl_rainbow.rainbow import PCL_rainbow
+        
         agent = PCL_rainbow(args, env)
     print('aba')
     run.init(args, env, agent, config)

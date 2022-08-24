@@ -1,4 +1,4 @@
-from env.env.lut_actions import Actions
+from env3d.agent.lut_actions import Actions
 import multiprocessing as mp
 import numpy as np
 import ctypes as c

@@ -1,3 +1,5 @@
+import numpy as np
+
 def matrix_from_angle(basis, angle):
     """Compute passive rotation matrix from rotation about basis vector.
     Parameters

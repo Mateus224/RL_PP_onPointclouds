@@ -1,20 +1,24 @@
+from importlib import reload
+
 from env3d.env import  Env
-from pcl_policy.pcl_rainbow.rainbow import PCL_rainbow
+import rainbow 
+reload(rainbow)
+
 import os
 import numpy as np
 from tqdm import trange
 from pcl_policy.pcl_rainbow.memory import ReplayMemory
+from pcl_policy.pcl_rainbow.rainbow import PCL_rainbow
 
 
 
 def init(args,env, agent,config):
 
     if True:
-        print('aassaa')
         agent.train()
-        print('aassaa')
-        if type(agent)==PCL_rainbow:
-            print('aa34aa')
+        print(type(agent))
+        if type(agent)==rainbow.PCL_rainbow:
+            print("aaadddd")
             timeout=False
             mem = ReplayMemory(args, args.num_replay_memory)
             priority_weight_increase = (1 - args.priority_weight) / (args.T_max - args.learn_start)
@@ -23,38 +27,36 @@ def init(args,env, agent,config):
                 os.makedirs(results_dir)
             T, done = 0, False
             sum_reward=0
-            print('12345')
             state, _ = env.reset()
-            for T in trange(1, int(args.num_steps)):
+            for T in trange(1, 1000):#int(args.num_steps)):
                 if done or timeout:
 
                     #print(sum_reward,'  ------  Litter:', np.sum(env.reward_map_bel))#,(sum_reward+(0.35*done))/(env.start_entr_map))
                     sum_reward=0
-                    state, _ = env.reset(h_level=False)
+                    state, _ = env.reset()
 
-
+                    
                     litter=env.litter
                     print(sum_reward,'------', litter)#,(sum_reward+(0.35*done))/(env.start_entr_map))
                     sum_reward=0
-                    state, _ = env.reset(h_level=False)
+                    state, _ = env.reset()
                     episode+=1
                     #writer.add_scalar("Litter", litter, episode)
-
-                action = agent.epsilon_greedy(T,3000000, state, all_actions)
+                action = agent.epsilon_greedy(T,3000000, state)
 
 
                 agent.reset_noise()  # Draw a new set of noisy weights
 
 
-                next_state, reward, done, actions, sim_i, timeout = env.step(action, h_level=False, agent="rainbow")  # Step
+                next_state, reward, done, actions, sim_i, timeout = env.step(action)  # Step
                 sum_reward=sum_reward+reward
                  # Append transition to memory
 
                 # Train and test
-                if sim_i>0:
-                    for j in range(sim_i-1):
-                        mem.append(state, actions[j], 0, True)
-                mem.append(state, actions[sim_i], reward, done) 
+                #if sim_i>0:
+                #    for j in range(sim_i-1):
+                #        mem.append(state, actions[j], 0, True)
+                #mem.append(state, actions[sim_i], reward, done) 
                 if T >= 100000:#args.learn_start:
                     mem.priority_weight = min(mem.priority_weight + priority_weight_increase, 1)  # Anneal importance sampling weight β to 1
 

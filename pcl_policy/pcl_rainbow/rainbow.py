@@ -18,7 +18,7 @@ rng = default_rng(12345)
 
 class PCL_rainbow():
   def __init__(self, args, env):
-    self.action_space = 8#env.action_space()
+    self.action_space = 6#env.action_space()
     self.atoms = args.atoms
     self.Vmin = 0#args.V_min
     self.Vmax = 176#args.V_max
@@ -137,12 +137,12 @@ class PCL_rainbow():
     self.online_net.eval()
 
 
-  def epsilon_greedy(self,T, max,state):
+  def epsilon_greedy(self, T, max, state):
     if (max>T):
       prob=(max-T)/max
 
-      if rng.random()<prob:
-        action=np.random.randint(8)
+      if rng.random()<2:#prob:
+        action=np.random.rand(self.action_space)
       else:
         action=self.make_action(state)
     else:
